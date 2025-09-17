@@ -1,0 +1,63 @@
+{
+  "info": {
+    "name": "FolkFestival",
+    "_postman_id": "folk-festival-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth/Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/auth/register",
+          "host": [
+            "http://localhost:8080"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"martha\", \"fullName\": \"Martha Folk\", \"password\": \"pass\"}"
+        }
+      }
+    },
+    {
+      "name": "Auth/Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/auth/login",
+          "host": [
+            "http://localhost:8080"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"martha\", \"password\": \"pass\"}"
+        }
+      }
+    }
+  ]
+}
