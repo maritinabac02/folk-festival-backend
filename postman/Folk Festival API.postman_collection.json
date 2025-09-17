@@ -1,0 +1,408 @@
+{
+	"info": {
+		"_postman_id": "4b09b73c-76d7-47b0-800c-3726954a10b4",
+		"name": "Folk Festival API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48473697"
+	},
+	"item": [
+		{
+			"name": "Auth – Login (Organizer)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+							"const data = pm.response.json();\r",
+							"pm.environment.set(\"token\", data.token);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"alice\",\"password\":\"pass\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth – Login (Artist)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"tokenArtist\", pm.response.json().token);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"bob\",\"password\":\"pass\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth – Login (Staff)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"tokenStaff\", pm.response.json().token);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"sue\",\"password\":\"pass\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Festivals – Create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"201/200\", () => pm.expect([200,201]).to.include(pm.response.code));\r",
+							"pm.environment.set(\"festivalId\", pm.response.json().id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"New Festival\",\r\n  \"description\": \"A celebration of folk music\",\r\n  \"startDate\": \"2025-10-20\",\r\n  \"endDate\": \"2025-10-23\",\r\n  \"venue\": \"Folk Park\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/festivals",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"festivals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Festivals – Change state → SUBMISSION",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenOrganizer}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/festivals/{{festivalId}}/state/SUBMISSION\n",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"festivals",
+						"{{festivalId}}",
+						"state",
+						"SUBMISSION\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth – Login (Organizer)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const j = pm.response.json();\r",
+							"pm.environment.set(\"tokenOrganizer\", j.token);\r",
+							"\r",
+							"try {\r",
+							"  const payload = JSON.parse(atob(j.token.split('.')[1]));\r",
+							"  console.log(\"JWT subject:\", payload.sub || payload.username);\r",
+							"  pm.environment.set(\"whoami\", payload.sub || payload.username || \"\");\r",
+							"} catch(e) { console.log(e); }"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\": \"alice\", \"password\": \"pass\" }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer{{tokenOrganizer}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/festivals/{{festivalId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"festivals",
+						"{{festivalId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Performances – Create (Artist)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"201/200\", () => pm.expect([200,201]).to.include(pm.response.code));\r",
+							"const p = pm.response.json();\r",
+							"pm.environment.set(\"performanceId\", p.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenArtist}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"festivalId\": \"{{festivalId}}\",\r\n  \"name\": \"Milo mou kokkino\",\r\n  \"description\": \"Traditional fiddle tunes\",\r\n  \"genre\": \"Folk\",\r\n  \"durationMinutes\": 45\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/performances",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"performances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Performances – Update details (Artist)",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Festivals – Change state → ASSIGNMENT",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/festivals/{{festivalId}}/state?value=ASSIGNMENT",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"festivals",
+						"{{festivalId}}",
+						"state"
+					],
+					"query": [
+						{
+							"key": "value",
+							"value": "ASSIGNMENT"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
