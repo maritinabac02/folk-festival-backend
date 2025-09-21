@@ -2,45 +2,24 @@ package com.folkfest.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
-@Document("festivals")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data @NoArgsConstructor @AllArgsConstructor
+@Document(collection = "festivals")
 public class Festival {
+    @Id
+    private String id;
 
-  @Id
-  private String id;
+    @Indexed(unique = true)
+    private String name;
 
-  private String name;
-  private String description;
-  private LocalDate startDate;
-  private LocalDate endDate;
-  private String venue;
+    private String description;
+    private String venue;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-  // --- ΝΕΑ πεδία που ζητά το service ---
-  /** Layout/διάταξη χώρου (π.χ. χάρτης σκηνών, ζωνών κοινού κ.λπ.) */
-  private String venueLayout;
-  /** Πληροφορίες budget (π.χ. κόστος σκηνών, security, κ.λπ.) */
-  private String budgetInfo;
-  /** Πληροφορίες vendors (π.χ. λίστα προμηθευτών/food trucks) */
-  private String vendorInfo;
-  // --------------------------------------
-
-  private FestivalState state;
-  private Instant createdAt;
-
-  // ΠΟΤΕ null — ασφαλές για add(...)
-  @Builder.Default
-  private Set<String> organizerUserIds = new HashSet<>();
-
-  @Builder.Default
-  private Set<String> staffUserIds = new HashSet<>();
+    private FestivalState state = FestivalState.CREATED;
 }

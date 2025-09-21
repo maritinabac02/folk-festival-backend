@@ -1,1 +1,10 @@
-package com.folkfest.model; public enum PerformanceState { CREATED, SUBMITTED, REVIEWED, APPROVED, SCHEDULED, REJECTED }
+package com.folkfest.model;
+
+public enum PerformanceState {
+    CREATED,
+    SUBMITTED,
+    REVIEWED,
+    APPROVED,
+    REJECTED,
+    SCHEDULED
+}

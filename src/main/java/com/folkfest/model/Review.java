@@ -1,6 +1,9 @@
 package com.folkfest.model;
+
 import lombok.*;
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+
+@Data @NoArgsConstructor @AllArgsConstructor
 public class Review {
-  private String staffUserId; private int score; private String comments;
+    private Integer score;     // 0..100
+    private String comments;   // detailed comments
 }

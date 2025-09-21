@@ -1,12 +1,60 @@
 package com.folkfest.controller;
-import com.folkfest.dto.FestivalDtos.*; import com.folkfest.model.*; import com.folkfest.service.FestivalService; import jakarta.validation.Valid; import org.springframework.http.ResponseEntity; import org.springframework.security.core.annotation.AuthenticationPrincipal; import org.springframework.security.core.userdetails.UserDetails; import org.springframework.web.bind.annotation.*; import java.util.Set;
-@RestController @RequestMapping("/api/festivals")
+
+import com.folkfest.dto.FestivalDtos.*;
+import com.folkfest.exception.ApiException;
+import com.folkfest.model.FestivalState;
+import com.folkfest.service.FestivalService;
+import jakarta.validation.Valid;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/festivals")
 public class FestivalController {
-  private final FestivalService festivalService; public FestivalController(FestivalService festivalService){ this.festivalService=festivalService; }
-  @PostMapping public ResponseEntity<Festival> create(@Valid @RequestBody CreateFestivalRequest req, @AuthenticationPrincipal UserDetails me){ return ResponseEntity.ok(festivalService.createFestival(req, me.getUsername())); }
-  @PatchMapping("/{id}") public ResponseEntity<Festival> update(@PathVariable String id, @RequestBody UpdateFestivalRequest req, @AuthenticationPrincipal UserDetails me){ return ResponseEntity.ok(festivalService.updateFestival(id, req, me.getUsername())); }
-  @PostMapping("/{id}/state/{next}") public ResponseEntity<Festival> changeState(@PathVariable String id, @PathVariable FestivalState next, @AuthenticationPrincipal UserDetails me){ return ResponseEntity.ok(festivalService.changeState(id, next, me.getUsername())); }
-  @PostMapping("/{id}/organizers") public ResponseEntity<Festival> addOrganizers(@PathVariable String id, @RequestBody Set<String> usernames, @AuthenticationPrincipal UserDetails me){ return ResponseEntity.ok(festivalService.addOrganizers(id, usernames, me.getUsername())); }
-  @PostMapping("/{id}/staff") public ResponseEntity<Festival> addStaff(@PathVariable String id, @RequestBody Set<String> usernames, @AuthenticationPrincipal UserDetails me){ return ResponseEntity.ok(festivalService.addStaff(id, usernames, me.getUsername())); }
-  @DeleteMapping("/{id}") public ResponseEntity<?> deleteFestival(@PathVariable String id, @AuthenticationPrincipal UserDetails me){ festivalService.deleteFestival(id, me.getUsername()); return ResponseEntity.noContent().build(); }
+    private final FestivalService service;
+
+    public FestivalController(FestivalService service){ this.service = service; }
+
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody CreateFestivalRequest req){
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") String id,
+                                    @Valid @RequestBody UpdateFestivalRequest req){
+        return ResponseEntity.ok(service.update(id, req));
+    }
+
+    
+    @PatchMapping("/{id}/state")
+    public ResponseEntity<?> changeStateBody(@PathVariable("id") String id,
+                                             @Valid @RequestBody ChangeFestivalStateRequest req){
+        FestivalState next;
+        try { next = FestivalState.valueOf(req.next); }
+        catch (IllegalArgumentException e){ throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid state: " + req.next); }
+        return ResponseEntity.ok(service.changeState(id, next));
+    }
+
+    
+    @PostMapping("/{id}/state/{next}")
+    public ResponseEntity<?> changeStatePath(@PathVariable("id") String id,
+                                             @PathVariable("next") String next){
+        FestivalState st;
+        try { st = FestivalState.valueOf(next); }
+        catch (IllegalArgumentException e){ throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid state: " + next); }
+        return ResponseEntity.ok(service.changeState(id, st));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> view(@PathVariable("id") String id){
+        return ResponseEntity.ok(service.view(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") String id){
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
+

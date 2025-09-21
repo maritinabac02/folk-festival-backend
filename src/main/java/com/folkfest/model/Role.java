@@ -1,1 +1,8 @@
-package com.folkfest.model; public enum Role { VISITOR, ARTIST, ORGANIZER, STAFF }
+package com.folkfest.model;
+
+public enum Role {
+    VISITOR,
+    ARTIST,
+    ORGANIZER,
+    STAFF
+}

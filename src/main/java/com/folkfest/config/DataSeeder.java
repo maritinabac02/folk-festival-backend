@@ -2,48 +2,60 @@ package com.folkfest.config;
 
 import com.folkfest.model.*;
 import com.folkfest.repo.*;
+import com.folkfest.service.RoleService;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.time.*;
-import java.util.List;
+import org.springframework.stereotype.Component;
 
-@Configuration
-public class DataSeeder {
-  @Bean
-  CommandLineRunner init(UserRepository users, FestivalRepository festivals, PerformanceRepository performances, RoleAssignmentRepository roles, PasswordEncoder encoder){
-    return args -> {
-      if(users.count()==0){
-        var alice = users.save(com.folkfest.model.User.builder().username("alice").fullName("Alice Folk").passwordHash(encoder.encode("pass")).active(true).build());
-        var bob   = users.save(com.folkfest.model.User.builder().username("bob").fullName("Bob Fiddler").passwordHash(encoder.encode("pass")).active(true).build());
-        var staff = users.save(com.folkfest.model.User.builder().username("sue").fullName("Sue Stage").passwordHash(encoder.encode("pass")).active(true).build());
-        var fest = festivals.save(com.folkfest.model.Festival.builder().name("Folk Roots Festival").description("A celebration of folk music").startDate(LocalDate.now().plusDays(30)).endDate(LocalDate.now().plusDays(33)).venue("Folk Park").state(FestivalState.CREATED).createdAt(Instant.now()).build());
+@Component
+public class DataSeeder implements CommandLineRunner {
 
-        fest.getOrganizerUserIds().add(alice.getId());
-        festivals.save(fest);
-        roles.save(new RoleAssignment(null, alice.getId(), fest.getId(), com.folkfest.model.Role.ORGANIZER));
+    private final UserRepository users;
+    private final FestivalRepository festivals;
+    private final PerformanceRepository perfs;
+    private final PasswordEncoder encoder;
+    private final RoleService roles;
 
-        fest.getStaffUserIds().add(staff.getId());
-        festivals.save(fest);
-        roles.save(new RoleAssignment(null, staff.getId(), fest.getId(), com.folkfest.model.Role.STAFF));
+    public DataSeeder(UserRepository users, FestivalRepository festivals,
+                      PerformanceRepository perfs, PasswordEncoder encoder, RoleService roles) {
+        this.users = users; this.festivals = festivals; this.perfs = perfs; this.encoder = encoder; this.roles = roles;
+    }
 
-        performances.save(com.folkfest.model.Performance.builder()
-            .festivalId(fest.getId())
-            .name("Bob & The Fiddlers")
-            .description("Traditional fiddle tunes")
-            .genre("Folk")
-            .durationMinutes(45)
-            .bandMembers(List.of("Bob Fiddler"))
-            .artistsUserIds(List.of(bob.getId()))
-            .technicalRequirements("2 mics, 1 DI, stage monitors")
-            .merchandiseItems(List.of("CD","T-shirt"))
-            .setlist(List.of("Tune 1","Tune 2"))
-            .preferredRehearsalTimes(List.of("Day -1 afternoon"))
-            .preferredPerformanceSlots(List.of("Day 1 evening"))
-            .state(PerformanceState.CREATED)
-            .createdAt(Instant.now())
-            .build());
-      }
-    };
-  }
+    @Override
+    public void run(String... args) {
+        // users
+        if (users.findByUsername("alice").isEmpty()) {
+            var u = new User(); u.setUsername("alice"); u.setEmail("alice@mail.test");
+            u.setFullName("Alice Organizer"); u.setPasswordHash(encoder.encode("pass")); u.setActive(true);
+            users.save(u);
+        }
+        if (users.findByUsername("sue").isEmpty()) {
+            var u = new User(); u.setUsername("sue"); u.setEmail("sue@mail.test");
+            u.setFullName("Sue Staff"); u.setPasswordHash(encoder.encode("pass")); u.setActive(true);
+            users.save(u);
+        }
+        if (users.findByUsername("bob").isEmpty()) {
+            var u = new User(); u.setUsername("bob"); u.setEmail("bob@mail.test");
+            u.setFullName("Bob Artist"); u.setPasswordHash(encoder.encode("pass")); u.setActive(true);
+            users.save(u);
+        }
+
+        // 1 sample festival
+        Festival f = festivals.findFirstByOrderByStartDateAsc().orElseGet(() -> {
+            Festival nf = new Festival();
+            nf.setName("FolkFest 2025");
+            nf.setDescription("Seeded festival");
+            nf.setVenue("Main Park");
+            nf.setStartDate(java.time.LocalDate.now().plusDays(10));
+            nf.setEndDate(java.time.LocalDate.now().plusDays(12));
+            nf.setState(FestivalState.CREATED);
+            return festivals.save(nf);
+        });
+
+        // roles
+        roles.grantRole("alice", f.getId(), Role.ORGANIZER);
+        roles.grantRole("sue", f.getId(), Role.STAFF);
+        // ο bob θα γίνει ARTIST όταν δημιουργήσει performance
+    }
 }
+

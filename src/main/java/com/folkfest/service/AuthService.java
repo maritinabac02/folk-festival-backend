@@ -1,11 +1,42 @@
 package com.folkfest.service;
-import com.folkfest.dto.AuthDtos.*; import com.folkfest.exception.ApiException; import com.folkfest.model.User; import com.folkfest.repo.UserRepository;
-import com.folkfest.security.JwtUtil; import org.springframework.http.HttpStatus; import org.springframework.security.authentication.*; import org.springframework.security.core.Authentication; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.stereotype.Service;
+
+import com.folkfest.dto.AuthDtos.*;
+import com.folkfest.exception.ApiException;
+import com.folkfest.model.User;
+import com.folkfest.repo.UserRepository;
+import com.folkfest.security.JwtUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 @Service
 public class AuthService {
-  private final UserRepository userRepository; private final PasswordEncoder encoder; private final AuthenticationManager authManager; private final JwtUtil jwtUtil;
-  public AuthService(UserRepository userRepository, PasswordEncoder encoder, AuthenticationManager authManager, JwtUtil jwtUtil){ this.userRepository=userRepository; this.encoder=encoder; this.authManager=authManager; this.jwtUtil=jwtUtil; }
-  public void register(RegisterRequest req){ if(userRepository.existsByUsername(req.username())) throw new ApiException(HttpStatus.CONFLICT,"Username already exists");
-    User u = User.builder().username(req.username()).fullName(req.fullName()).passwordHash(encoder.encode(req.password())).active(true).build(); userRepository.save(u); }
-  public JwtResponse login(LoginRequest req){ Authentication a = authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username(), req.password())); return new JwtResponse(jwtUtil.generateToken(a.getName())); }
+    private final UserRepository users;
+    private final PasswordEncoder encoder;
+    private final JwtUtil jwt;
+
+    public AuthService(UserRepository users, PasswordEncoder encoder, JwtUtil jwt) {
+        this.users = users; this.encoder = encoder; this.jwt = jwt;
+    }
+
+    public void register(RegisterRequest r) {
+        if (users.findByUsername(r.username).isPresent())
+            throw new ApiException(HttpStatus.CONFLICT, "Username already exists");
+        User u = new User();
+        u.setUsername(r.username);
+        u.setEmail(r.email);
+        u.setFullName(r.fullName);
+        u.setPasswordHash(encoder.encode(r.password));
+        u.setActive(true);
+        users.save(u);
+    }
+
+    public AuthResponse login(LoginRequest r) {
+        User u = users.findByUsername(r.username)
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+        if (!u.isActive()) throw new ApiException(HttpStatus.FORBIDDEN, "User inactive");
+        if (!encoder.matches(r.password, u.getPasswordHash()))
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        return new AuthResponse(jwt.generateToken(u.getUsername()));
+    }
 }
