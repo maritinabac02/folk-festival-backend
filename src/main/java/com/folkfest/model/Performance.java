@@ -41,20 +41,15 @@ public class Performance {
 
     // assignment / review
     private String assignedStaff;               // username
-    private Integer reviewScore;                // mirror of Review.score (for quick access)
-    private String reviewComments;              // mirror of Review.comments
+    private Review review;
 
     // final decision / scheduling
     private String rejectionReason;
     private String scheduledTime;
     private String scheduledStage;
 
-    // optional embedded review object (if θες να το χρησιμοποιήσεις αργότερα)
-    private Review review;
-
-    /** Χρήσιμο helper για επισκέπτες: κρατά μόνο δημόσιες πληροφορίες. */
+    /** Removes everything a visitor should not see. Keeps name, genre, schedule, main artist and state. */
     public void stripSensitiveForVisitor() {
-        // αφήνουμε μόνο ό,τι χρειάζεται ο VISITOR
         this.description = null;
         this.durationMinutes = null;
         this.technicalRequirements = null;
@@ -62,11 +57,8 @@ public class Performance {
         this.preferredRehearsalTimes = null;
         this.preferredPerformanceSlots = null;
         this.assignedStaff = null;
-        this.reviewScore = null;
-        this.reviewComments = null;
         this.rejectionReason = null;
         this.review = null;
-        this.bandMembers = null; // μόνο mainArtist εκτίθεται
-        // κρατάμε: name, genre, scheduledTime, scheduledStage, mainArtist, state, festivalId, id
+        this.bandMembers = null;
     }
 }
