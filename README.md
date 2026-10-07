@@ -2,7 +2,7 @@
 
 ![Build](https://github.com/maritinabac02/folk-festival-backend/actions/workflows/build.yml/badge.svg)
 
-This started as my project for the **Software Engineering** course (321-4002) at the University of the Aegean, which I handed in in January 2025. The task was to build only the backend of a system that runs a music festival: artists send in their performances, staff review them, and organizers decide on the final lineup.
+This started as my project for the **Software Engineering** course (321-4002) in the Department of Information and Communication Systems Engineering at the University of the Aegean, which I handed in in January 2025. The task was to build only the backend of a system that runs a music festival: artists send in their performances, staff review them, and organizers decide on the final lineup.
 
 In 2026 I came back to it to clean it up and fix the things I didn't have time for back then. More on that [below](#what-i-changed-in-2026).
 
