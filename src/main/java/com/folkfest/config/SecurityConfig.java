@@ -43,9 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
-                .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                // Αν χρειαστεί ADMIN, θα το προσθέσουμε αφού δώσουμε πραγματικό authority
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
             )

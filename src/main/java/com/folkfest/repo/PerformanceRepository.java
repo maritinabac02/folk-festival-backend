@@ -45,7 +45,7 @@ public interface PerformanceRepository extends MongoRepository<Performance, Stri
 
     private static boolean artistMatch(Performance p, List<String> words){
         if (words.isEmpty()) return true;
-        // ελέγχουμε mainArtist + bandMembers
+        // match against the main artist and every band member
         String main = p.getMainArtist() == null ? "" : p.getMainArtist().toLowerCase();
         List<String> band = p.getBandMembers() == null ? List.of() :
                 p.getBandMembers().stream().filter(Objects::nonNull).map(String::toLowerCase).toList();
