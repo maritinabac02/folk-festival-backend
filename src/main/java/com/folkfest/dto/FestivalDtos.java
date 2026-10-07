@@ -17,7 +17,7 @@ public class FestivalDtos {
         public String name;
         public String description;
         public String venue;
-        // extra fields (layout/budget/vendor) μπορούν να μπουν εδώ
+        // more fields (layout, budget, vendors) can be added here later
     }
     public static class ChangeFestivalStateRequest {
         @NotBlank public String next; // e.g. SUBMISSION, ASSIGNMENT ...

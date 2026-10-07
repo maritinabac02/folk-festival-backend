@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .withUsername(u.getUsername())
                 .password(u.getPasswordHash())
                 .disabled(!u.isActive())
-                .authorities("USER") // οι festival-ρόλοι ελέγχονται επιχειρησιακά
+                .authorities("USER") //festival roles are checked in the services (RoleService)
                 .build();
     }
 }

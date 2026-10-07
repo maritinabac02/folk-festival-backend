@@ -26,24 +26,27 @@ public class FestivalController {
         return ResponseEntity.ok(service.update(id, req));
     }
 
-    
     @PatchMapping("/{id}/state")
     public ResponseEntity<?> changeStateBody(@PathVariable("id") String id,
                                              @Valid @RequestBody ChangeFestivalStateRequest req){
         FestivalState next;
-        try { next = FestivalState.valueOf(req.next); }
+        try { next = FestivalState.valueOf(req.next.toUpperCase()); }
         catch (IllegalArgumentException e){ throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid state: " + req.next); }
         return ResponseEntity.ok(service.changeState(id, next));
     }
 
-    
     @PostMapping("/{id}/state/{next}")
     public ResponseEntity<?> changeStatePath(@PathVariable("id") String id,
                                              @PathVariable("next") String next){
         FestivalState st;
-        try { st = FestivalState.valueOf(next); }
+        try { st = FestivalState.valueOf(next.toUpperCase()); }
         catch (IllegalArgumentException e){ throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid state: " + next); }
         return ResponseEntity.ok(service.changeState(id, st));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> list() {
+        return ResponseEntity.ok(service.list());
     }
 
     @GetMapping("/{id}")
@@ -57,4 +60,3 @@ public class FestivalController {
         return ResponseEntity.noContent().build();
     }
 }
-
