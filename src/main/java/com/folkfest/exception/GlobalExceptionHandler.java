@@ -1,5 +1,8 @@
 package com.folkfest.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,31 +14,36 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<?> handleApi(ApiException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", ex.getStatus().value());
-        body.put("error", ex.getStatus().getReasonPhrase());
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(ex.getStatus()).body(body);
+        return error(ex.getStatus(), ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
-        body.put("message", ex.getBindingResult().getFieldErrors().stream()
+        return error(HttpStatus.BAD_REQUEST, ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage()).toList());
-        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<?> handleDuplicate(DuplicateKeyException ex) {
+        return error(HttpStatus.CONFLICT, "Resource already exists");
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleOther(Exception ex) {
+        // log the real cause, but don't send internal details to the client
+        log.error("Unexpected error", ex);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+    }
+
+    private ResponseEntity<?> error(HttpStatus status, Object message) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("message", message);
+        return ResponseEntity.status(status).body(body);
     }
 }
